@@ -3,7 +3,7 @@
 #############
 
 provider "aws" {
-  region = "${var.region}"
+  region                  = var.region
 }
 
 ## NOTE: Uncomment if you change the main provider region to anything except "us-east-1"
