@@ -7,18 +7,18 @@ resource "aws_cognito_identity_pool" "main" {
   allow_unauthenticated_identities = false
 
   cognito_identity_providers {
-    client_id               = "${aws_cognito_user_pool_client.web.id}"
+    client_id               = aws_cognito_user_pool_client.web.id
     provider_name           = "cognito-idp.${var.region}.amazonaws.com/${aws_cognito_user_pool.main.id}"
     server_side_token_check = false
   }
 }
 
 resource "aws_cognito_identity_pool_roles_attachment" "main" {
-  identity_pool_id = "${aws_cognito_identity_pool.main.id}"
+  identity_pool_id = aws_cognito_identity_pool.main.id
 
   roles = {
-    "authenticated"   = "${aws_iam_role.cognito_authenticated.arn}"
-    "unauthenticated" = "${aws_iam_role.cognito_unauthenticated.arn}"
+    "authenticated"   = aws_iam_role.cognito_authenticated.arn
+    "unauthenticated" = aws_iam_role.cognito_unauthenticated.arn
   }
 }
 
@@ -27,7 +27,7 @@ resource "aws_cognito_identity_pool_roles_attachment" "main" {
 #############
 
 resource "aws_cognito_user_pool" "main" {
-  name = "${var.namespace}"
+  name = var.namespace
 
   verification_message_template {
     default_email_option = "CONFIRM_WITH_CODE"
@@ -58,8 +58,8 @@ resource "aws_cognito_user_pool" "main" {
   }
 
   sms_configuration {
-    external_id    = "${var.cognito_role_external_id}"
-    sns_caller_arn = "${aws_iam_role.cognito_sns_role.arn}"
+    external_id    = var.cognito_role_external_id
+    sns_caller_arn = aws_iam_role.cognito_sns_role.arn
   }
 
   admin_create_user_config {
@@ -80,8 +80,8 @@ EOF
   }
 
   tags = {
-    Project = "${var.app_name}"
-    Stage   = "${var.stage}"
+    Project = var.app_name
+    Stage   = var.stage
   }
 }
 
@@ -91,7 +91,7 @@ EOF
 
 resource "aws_cognito_user_group" "manager" {
   name         = "manager"
-  user_pool_id = "${aws_cognito_user_pool.main.id}"
+  user_pool_id = aws_cognito_user_pool.main.id
   description  = "Permission to send worker notifications"
 }
 
@@ -101,7 +101,7 @@ resource "aws_cognito_user_group" "manager" {
 
 resource "aws_cognito_user_pool_client" "web" {
   name         = "${var.namespace}-client-web"
-  user_pool_id = "${aws_cognito_user_pool.main.id}"
+  user_pool_id = aws_cognito_user_pool.main.id
 }
 
 #######
@@ -133,8 +133,8 @@ resource "aws_iam_role" "cognito_authenticated" {
 EOF
 
   tags = {
-    Project = "${var.app_name}"
-    Stage   = "${var.stage}"
+    Project = var.app_name
+    Stage   = var.stage
     Service = "cognito"
   }
 }
@@ -164,8 +164,8 @@ resource "aws_iam_role" "cognito_unauthenticated" {
 EOF
 
   tags = {
-    Project = "${var.app_name}"
-    Stage   = "${var.stage}"
+    Project = var.app_name
+    Stage   = var.stage
     Service = "cognito"
   }
 }
@@ -193,8 +193,8 @@ resource "aws_iam_role" "cognito_sns_role" {
 EOF
 
   tags = {
-    Project = "${var.app_name}"
-    Stage   = "${var.stage}"
+    Project = var.app_name
+    Stage   = var.stage
     Service = "cognito"
   }
 }
@@ -221,6 +221,6 @@ EOF
 
 resource "aws_iam_policy_attachment" "cognito_sns_role" {
   name       = "${var.namespace}-cognito-sns-role-policy"
-  roles      = ["${aws_iam_role.cognito_sns_role.name}"]
-  policy_arn = "${aws_iam_policy.cognito_sns_role.arn}"
+  roles      = [aws_iam_role.cognito_sns_role.name]
+  policy_arn = aws_iam_policy.cognito_sns_role.arn
 }
